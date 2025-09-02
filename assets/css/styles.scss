@@ -87,6 +87,7 @@ body {
   width: 150px;
   height: 150px;
   border-radius: 50%;
+  border: none;
   background-color: $circle-btn-bg;
   color: #fff;
   font-weight: bold;
@@ -95,7 +96,22 @@ body {
   align-items: center;
   justify-content: center;
   margin: auto;
-  // box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  &.active {
+    background-color: #00bb00;
+  }
+
+  &.inactive {
+    background-color: #bb0000;
+  }
 }
 
 .form-control-custom {
@@ -209,6 +225,51 @@ body {
   border-right:  1px solid #333;
 }
 
+.period-select {
+    background-color: $card-bg !important;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-weight: 500;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    appearance: none; // Important for custom styling
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    &:focus {
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    &.form-select {
+        padding-right: 2.5rem !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+    }
+}
+
+// Custom dropdown styles
+select.period-select {
+    option {
+        background-color: $card-bg;
+        color: #000;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 10px;
+        
+        &:hover,
+        &:focus,
+        &:active,
+        &:checked {
+            background-color: darken($card-bg, 10%) !important;
+            color: #000;
+        }
+    }
+}
 
 // Responsive sidebar geser di mobile
 @media (max-width: 767.98px) {

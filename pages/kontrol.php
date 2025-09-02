@@ -1,103 +1,139 @@
+<?php
+// Include database connection
+require_once __DIR__.'/../functions/config.php';
+
+// Ambil status dari kontrol_realtime
+$sql = 'SELECT * FROM kontrol_realtime LIMIT 1';
+$result = $conn->query($sql);
+$kontrol = $result->fetch_assoc();
+
+// Set default values if no data exists
+if (!$kontrol) {
+    $kontrol = [
+        'sistem_penyiraman' => 0,
+        'tekan_untuk_hidupkan_sprayer' => 0,
+    ];
+}
+
+// Ambil jadwal dari kontrol_data
+$sql_jadwal = 'SELECT * FROM kontrol_data ORDER BY hidupkan_sprayer_pada_jam ASC';
+$result_jadwal = $conn->query($sql_jadwal);
+$jadwal = [];
+while ($row = $result_jadwal->fetch_assoc()) {
+    $jadwal[] = $row;
+}
+?>
+
 <div class="container my-4">
     <div class="row g-4">
-
-        <!-- 1. Tekan Untuk Hidupkan Sprayer -->
+        <!-- Sistem Penyiraman Otomatis -->
         <div class="col-md-6 col-12">
             <div class="card-custom-control text-center p-4">
                 <h5 class="mb-4">Sistem Penyiraman</h5>
-                <div class="circle-button">Otomatis</div>
+                <button class="circle-button <?php echo $kontrol['sistem_penyiraman'] ? 'active' : 'inactive'; ?>" 
+                        id="btnOtomatis" 
+                        data-status="<?php echo $kontrol['sistem_penyiraman']; ?>">
+                    <?php echo $kontrol['sistem_penyiraman'] ? 'Otomatis' : 'Manual'; ?>
+                </button>
             </div>
         </div>
 
-               <div class="col-md-6 col-12">
+        <!-- Kontrol Manual -->
+        <div class="col-md-6 col-12">
             <div class="card-custom-control text-center p-4">
                 <h5 class="mb-4">Tekan Untuk Hidupkan Sprayer</h5>
-                <div class="circle-button">Hidup</div>
+                <button class="circle-button <?php echo $kontrol['tekan_untuk_hidupkan_sprayer'] ? 'active' : 'inactive'; ?>" 
+                        id="btnManual" 
+                        data-status="<?php echo $kontrol['tekan_untuk_hidupkan_sprayer']; ?>">
+                    <?php echo $kontrol['tekan_untuk_hidupkan_sprayer'] ? 'Hidup' : 'Mati'; ?>
+                </button>
             </div>
         </div>
 
-        <!-- 2. Hidupkan Sprayer Menggunakan Timer -->
-        <!-- <div class="col-md-6 col-12">
-            <div class="card-custom-control p-4 text-center">
-                <h5 class="mb-4">Hidupkan Sprayer Menggunakan Timer</h5>
-                <div class="d-flex flex-column flex-md-row align-items-center justify-content-center">
-                    <div class="bg-form-custom2 flex-grow-1 me-md-4 mb-4 mb-md-0">
-                        <div class="input-group mb-3">
-                            <input type="number" class="form-control form-control-custom fw-bold" value="5" min="1">
-                            <span class="input-group-text" style="min-width: 70px;">Menit</span>
-                        </div>
-                        <button class="btn btn-primary w-100">Submit</button>
-                    </div>
-                    <div class="d-flex justify-content-center align-items-center flex-shrink-0">
-                        <div class="circle-button">Proses</div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- 3. Hidupkan Sprayer Jika -->
-        <!-- <div class="col-md-6 col-12">
-            <div class="card-custom-control p-4 text-center">
-                <h5 class="mb-4">Hidupkan Sprayer Jika</h5>
-                <div class="d-flex flex-column flex-md-row align-items-center">
-                    <div class="bg-form-custom2 flex-grow-1 me-md-4 mb-4 mb-md-0">
-                        <div class="mb-3">
-                            <label class="form-label">Kelembaban Tanah Dibawah</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-custom fw-bold" value="50">
-                                <span class="input-group-text" style="min-width: 70px;">%</span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hidupkan Selama</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-custom fw-bold" value="5">
-                                <span class="input-group-text" style="min-width: 70px;">Menit</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary w-100">Submit</button>
-                    </div>
-                    <div class="d-flex justify-content-center align-items-center flex-shrink-0">
-                        <div class="circle-button">Tekan</div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-        <!-- 4. Hidupkan Sprayer Berdasarkan Jam -->
+        <!-- Kontrol Jadwal -->
         <div class="col-md-6 col-12">
-            <div
-                class="card-custom-control p-4 position-relative d-flex flex-column justify-content-center h-100 rounded">
+            <div class="card-custom-control p-4">
                 <h5 class="text-center mb-4">Hidupkan Sprayer Pada Jam</h5>
-
-                <div class="d-flex flex-column flex-md-row align-items-center">
-                    <!-- FORM JAM -->
-                    <div class="bg-form-custom2 flex-grow-1 me-md-4 w-100" id="jamList">
+                <form id="formJadwal">
+                    <div id="jamList">
+                        <?php foreach ($jadwal as $j) { ?>
+                        <div class="d-flex align-items-center mb-3 jam-item">
+                            <div class="me-2 w-100">
+                                <label class="form-label small mb-1">Mulai</label>
+                                <input type="time" class="form-control form-control-custom" 
+                                       name="mulai[]" value="<?php echo $j['hidupkan_sprayer_pada_jam']; ?>">
+                            </div>
+                            <div class="me-2 w-100">
+                                <label class="form-label small mb-1">Menit</label>
+                                <input type="number" class="form-control form-control-custom" 
+                                       name="menit[]" min="1" max="60" 
+                                       value="<?php echo $j['hidupkan_sprayer_selama_menit']; ?>">
+                            </div>
+                            <div class="ms-3">
+                                <input type="checkbox" name="aktif[]" class="form-check-input mt-4" checked>
+                            </div>
+                        </div>
+                        <?php } ?>
+                        
+                        <!-- Template untuk jadwal baru -->
                         <div class="d-flex align-items-center mb-3 jam-item">
                             <div class="me-2 w-100">
                                 <label class="form-label small mb-1">Mulai</label>
                                 <input type="time" class="form-control form-control-custom" name="mulai[]">
                             </div>
-
                             <div class="me-2 w-100">
-                                <label class="form-label small mb-1">Selesai</label>
-                                <input type="time" class="form-control form-control-custom" name="selesai[]">
+                                <label class="form-label small mb-1">Menit</label>
+                                <input type="number" class="form-control form-control-custom" 
+                                       name="menit[]" min="1" max="60">
                             </div>
-
                             <div class="ms-3">
                                 <input type="checkbox" name="aktif[]" class="form-check-input mt-4" disabled>
                             </div>
                         </div>
                     </div>
-
-                    <!-- TOMBOL -->
-                    <div class="d-flex justify-content-center align-items-center flex-shrink-0 mt-4 mt-md-0">
-                        <div class="circle-button">Hidup</div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
-
-
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Handle tombol otomatis
+    $('#btnOtomatis').click(function() {
+        const status = $(this).data('status') ? 0 : 1;
+        $.post('functions/update_kontrol.php', {
+            sistem_penyiraman: status
+        }, function(response) {
+            if(response.success) {
+                location.reload();
+            }
+        });
+    });
+
+    // Handle tombol manual
+    $('#btnManual').click(function() {
+        const status = $(this).data('status') ? 0 : 1;
+        $.post('functions/update_kontrol.php', {
+            tekan_untuk_hidupkan_sprayer: status
+        }, function(response) {
+            if(response.success) {
+                location.reload();
+            }
+        });
+    });
+
+    // Handle form jadwal
+    $('#formJadwal').submit(function(e) {
+        e.preventDefault();
+        $.post('functions/update_jadwal.php', $(this).serialize(), function(response) {
+            if(response.success) {
+                location.reload();
+            }
+        });
+    });
+});
+</script>

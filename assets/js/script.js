@@ -60,18 +60,15 @@ $(document).ready(function () {
 function updateCheckboxStates() {
   $(".jam-item").each(function () {
     const mulai = $(this).find('input[name="mulai[]"]').val();
-    const selesai = $(this).find('input[name="selesai[]"]').val();
+    const menit = $(this).find('input[name="menit[]"]').val();
     const checkbox = $(this).find('input[type="checkbox"]');
 
     let isValid = false;
 
-    if (mulai && selesai) {
-      const [jm, mm] = mulai.split(":").map(Number);
-      const [js, ms] = selesai.split(":").map(Number);
-      const waktuMulai = jm * 60 + mm;
-      const waktuSelesai = js * 60 + ms;
-
-      if (waktuSelesai > waktuMulai && waktuSelesai !== 0) {
+    if (mulai && menit) {
+      // Validasi: menit harus antara 1-60
+      const menitValue = parseInt(menit);
+      if (menitValue > 0 && menitValue <= 60) {
         isValid = true;
       }
     }
@@ -87,9 +84,9 @@ function updateCheckboxStates() {
 function hapusListKosongKecualiSatu() {
   const kosongItems = $(".jam-item").filter(function () {
     const mulai = $(this).find('input[name="mulai[]"]').val();
-    const selesai = $(this).find('input[name="selesai[]"]').val();
+    const menit = $(this).find('input[name="menit[]"]').val();
     const checked = $(this).find('input[type="checkbox"]').is(':checked');
-    return !mulai && !selesai && !checked;
+    return !mulai && !menit && !checked;
   });
 
   if (kosongItems.length > 1) {
@@ -104,9 +101,9 @@ function tambahListJikaChecklistDicek() {
 
   const kosongItems = $(".jam-item").filter(function () {
     const mulai = $(this).find('input[name="mulai[]"]').val();
-    const selesai = $(this).find('input[name="selesai[]"]').val();
+    const menit = $(this).find('input[name="menit[]"]').val();
     const checked = $(this).find('input[type="checkbox"]').is(':checked');
-    return !mulai && !selesai && !checked;
+    return !mulai && !menit && !checked;
   });
 
   if (checkedItems.length > 0 && kosongItems.length === 0) {
@@ -118,8 +115,8 @@ function tambahListJikaChecklistDicek() {
         </div>
 
         <div class="me-2 w-100">
-          <label class="form-label small mb-1">Selesai</label>
-          <input type="time" class="form-control form-control-custom" name="selesai[]">
+          <label class="form-label small mb-1">Menit</label>
+          <input type="number" class="form-control form-control-custom" name="menit[]" min="1" max="60">
         </div>
 
         <div class="ms-3">
@@ -141,7 +138,7 @@ $(document).ready(function () {
   handleFormLogic();
 });
 
-$(document).on("input change", 'input[name="mulai[]"], input[name="selesai[]"], input[type="checkbox"]', function () {
+$(document).on("input change", 'input[name="mulai[]"], input[name="menit[]"], input[type="checkbox"]', function () {
   handleFormLogic();
 });
 
