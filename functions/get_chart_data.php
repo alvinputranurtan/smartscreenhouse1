@@ -6,33 +6,31 @@ require_once 'config.php';
 $period = $_GET['period'] ?? 'hourly';
 
 if ($period === 'hourly') {
-    // Data 24 jam terakhir, rata-rata per jam
     $sql = "SELECT 
                 DATE_FORMAT(timestamp, '%H:00') as label,
-                ROUND(AVG(NULLIF(kelembaban_tanah, 0)), 1) as kelembaban_tanah,
-                ROUND(AVG(NULLIF(kelembaban_udara, 0)), 1) as kelembaban_udara,
-                ROUND(AVG(NULLIF(suhu_udara, 0)), 1) as suhu_udara,
+                ROUND(AVG(kelembaban_tanah), 1) as kelembaban_tanah,
+                ROUND(AVG(kelembaban_udara), 1) as kelembaban_udara,
+                ROUND(AVG(suhu_udara), 1) as suhu_udara,
                 COUNT(*) as sample_count
             FROM data 
             WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
-                AND kelembaban_tanah IS NOT NULL 
-                AND kelembaban_udara IS NOT NULL 
-                AND suhu_udara IS NOT NULL
+                AND kelembaban_tanah >= 0 AND kelembaban_tanah <= 100
+                AND kelembaban_udara >= 0 AND kelembaban_udara <= 100
+                AND suhu_udara >= 0 AND suhu_udara <= 100
             GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%d %H')
             ORDER BY timestamp ASC";
 } else {
-    // Data 7 hari terakhir, rata-rata per hari
     $sql = "SELECT 
                 DATE_FORMAT(timestamp, '%d/%m') as label,
-                ROUND(AVG(NULLIF(kelembaban_tanah, 0)), 1) as kelembaban_tanah,
-                ROUND(AVG(NULLIF(kelembaban_udara, 0)), 1) as kelembaban_udara,
-                ROUND(AVG(NULLIF(suhu_udara, 0)), 1) as suhu_udara,
+                ROUND(AVG(kelembaban_tanah), 1) as kelembaban_tanah,
+                ROUND(AVG(kelembaban_udara), 1) as kelembaban_udara,
+                ROUND(AVG(suhu_udara), 1) as suhu_udara,
                 COUNT(*) as sample_count
             FROM data 
             WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-                AND kelembaban_tanah IS NOT NULL 
-                AND kelembaban_udara IS NOT NULL 
-                AND suhu_udara IS NOT NULL
+                AND kelembaban_tanah >= 0 AND kelembaban_tanah <= 100
+                AND kelembaban_udara >= 0 AND kelembaban_udara <= 100
+                AND suhu_udara >= 0 AND suhu_udara <= 100
             GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%d')
             ORDER BY timestamp ASC";
 }
