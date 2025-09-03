@@ -1,7 +1,19 @@
 $(document).ready(function () {
+  let dashboardInterval; // Variable to store dashboard interval
+
   function loadPage(page, title, push = true) {
     $("#main-content").load("pages/" + page, function () {
-      if (page === "grafik.php") {
+      // Clear any existing intervals when loading new page
+      if (dashboardInterval) {
+        clearInterval(dashboardInterval);
+        dashboardInterval = null;
+      }
+
+      // Initialize specific page functionality
+      if (page === "dashboard.php") {
+        // Start dashboard updates only when on dashboard page
+        dashboardInterval = setInterval(updateDashboard, 5000);
+      } else if (page === "grafik.php") {
         loadGrafik(); // dari grafik.js
       }
     });
@@ -142,7 +154,15 @@ $(document).on("input change", 'input[name="mulai[]"], input[name="menit[]"], in
   handleFormLogic();
 });
 
-
-
+// Update dashboard function
+function updateDashboard() {
+    $.ajax({
+        url: 'pages/ajax_dashboard.php',
+        success: function(response) {
+            // Update dashboard values
+            // ...existing dashboard update code...
+        }
+    });
+}
 
 });

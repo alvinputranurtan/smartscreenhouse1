@@ -115,3 +115,5 @@
 [2025-09-02 18:25:08] User alvin login sukses.
 [2025-09-02 18:25:53] User alvin logout.
 [2025-09-02 18:25:56] User alvin login sukses.
+[2025-09-03 08:35:56] User alvin login sukses.
+[2025-09-03 08:40:35] User alvin logout.

@@ -21,7 +21,7 @@ function loadGrafik() {
             dataKey: 'suhu_udara'
         }
     };
-
+    
     // Function to fetch data from server
     async function fetchData(period) {
         try {
